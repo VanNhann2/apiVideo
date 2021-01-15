@@ -1,5 +1,5 @@
 import { logger } from '../utils'
-import { Server, Database } from '../services'
+import { Server, Database, GRpcServer } from '../services'
 import { model } from '../models'
 
 export class Root {
@@ -9,9 +9,13 @@ export class Root {
   /** @type {Database} */
   #database = null
 
+  /** @type {GRpcServer} */
+  #grpcServer = null
+
   constructor() {
     this.#server = new Server()
     this.#database = new Database()
+    this.#grpcServer = new GRpcServer()
   }
 
   start = async () => {
@@ -19,6 +23,9 @@ export class Root {
 
     logger.info('Starting server...')
     await this.#server.start()
+
+    logger.info('Starting gRPC server...')
+    await this.#grpcServer.start()
 
     logger.info('Starting database client...')
     await this.#database.start()

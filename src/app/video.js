@@ -19,10 +19,10 @@ export class Video {
    */
   getAll = async (ids, startDate, endDate, page) => {
     try {
-      const arrayIds = ids && ids != [] ? ids : undefined
-      const startSearchDate = startDate && startDate != '' && startDate != 'null' ? new Date(startDate).toISOString() : undefined
-      const endSearchDate = endDate && endDate != '' && endDate != 'null' ? new Date(endDate).toISOString() : undefined
-      let [err, conditions] = await to(model.video.conditions(arrayIds, startSearchDate, endSearchDate, page))
+      const startSearchDate = startDate && startDate !== '' && startDate !== 'null' ? new Date(startDate).toISOString() : undefined
+      const endSearchDate = endDate && endDate !== '' && endDate !== 'null' ? new Date(endDate).toISOString() : undefined
+
+      let [err, conditions] = await to(model.video.conditions(ids, startSearchDate, endSearchDate, page))
       if (err) throw err
 
       const dataPromise = model.video.getAll(conditions.conditionsData)
@@ -55,11 +55,21 @@ export class Video {
 
       return result
     } catch (error) {
-      logger.error('Video.getAll() error', error)
+      logger.error('Video.getById() error', error)
       throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Lấy video vi phạm thất bại' })
     }
   }
+  getByDate = async (requestDate) => {
+    try {
+      let [err, result] = await to(model.video.getByDate(requestDate))
+      if (err) throw err
 
+      return result
+    } catch (error) {
+      logger.error('Video.getById() error', error)
+      throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Lấy video vi phạm thất bại' })
+    }
+  }
   /**
    * Delete video
    * @param {string|mongoose.Types.ObjectId}

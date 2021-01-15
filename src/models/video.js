@@ -17,15 +17,16 @@ export class VideoModel extends BaseModel {
    * @param {Date} endSearchDate
    * @param {String|mongoose.Types.ObjectId} page
    */
-  conditions = async (arrayIds, startSearchDate, endSearchDate, page) => {
+  conditions = async (ids, startSearchDate, endSearchDate, page) => {
     const searchDateCondition =
       _.isEmpty(startSearchDate) && _.isEmpty(endSearchDate) ? {} : { $or: [{ vio_time: { $gte: new Date(startSearchDate), $lte: new Date(endSearchDate) } }] }
-
-    let arrIds = []
-    for (let id of arrayIds) {
-      arrIds.push(mongoose.Types.ObjectId(id))
+    const arrIds = []
+    if (!_.isEmpty(ids)) {
+      for (let id of ids) {
+        arrIds.push(mongoose.Types.ObjectId(id))
+      }
     }
-    let idsCondition = _.isEmpty(arrayIds) ? {} : { $or: [{ camera: { $in: arrIds } }] }
+    let idsCondition = _.isEmpty(ids) ? {} : { $or: [{ camera: { $in: arrIds } }] }
     const otherCondition = { deleted: { $ne: true } }
 
     const match = {
@@ -90,6 +91,13 @@ export class VideoModel extends BaseModel {
     return !_.isEmpty(result) ? result[0] : {}
   }
 
+  getByDate = async (requestDate) => {
+    const date = Date.parse(new Date(requestDate))
+    // const start = date + them 3 phut
+    // const end = date + them 3 phut
+    // created: { '$gte': today, '$lte': tomorrow }
+    // this.model.find({ start: { $gte: new ISODate('2017-04-14T23:59:59Z'), $lte: new ISODate('2017-04-15T23:59:59Z') } })
+  }
   /**
    *
    * @param {[String|mongoose.Types.ObjectId]} ids

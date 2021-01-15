@@ -13,3 +13,15 @@ export const videosSchema = {
   status: { type: Number },
   deleted: { type: Boolean },
 }
+
+export const cameraSchema = {
+  name: { type: String, required: true },
+  province: { type: String },
+  district: { type: String },
+  commune: { type: String },
+  group: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Group' }],
+  lat: { type: Number },
+  lng: { type: Number },
+  address: { type: String, default: '' },
+  deleted: { type: Boolean },
+}
