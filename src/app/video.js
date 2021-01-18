@@ -21,7 +21,7 @@ export class Video {
     try {
       const startSearchDate = startDate && startDate !== '' && startDate !== 'null' ? new Date(startDate).toISOString() : undefined
       const endSearchDate = endDate && endDate !== '' && endDate !== 'null' ? new Date(endDate).toISOString() : undefined
-
+      console.log(ids, startDate, endDate, page)
       let [err, conditions] = await to(model.video.conditions(ids, startSearchDate, endSearchDate, page))
       if (err) throw err
 

@@ -92,11 +92,23 @@ export class VideoModel extends BaseModel {
   }
 
   getByDate = async (requestDate) => {
-    const date = Date.parse(new Date(requestDate))
-    // const start = date + them 3 phut
-    // const end = date + them 3 phut
-    // created: { '$gte': today, '$lte': tomorrow }
-    // this.model.find({ start: { $gte: new ISODate('2017-04-14T23:59:59Z'), $lte: new ISODate('2017-04-15T23:59:59Z') } })
+    const date = Date.parse(requestDate)
+    const start = date + 180000
+    const end = date - 180000
+    const sortStart = { $gte: start }
+    const sortEnd = { $lte: end }
+    const match = {
+      $match: { $and: [sortStart, sortEnd] },
+    }
+
+    const project = {
+      $project: {
+        _id: 0,
+      },
+    }
+    let [err, result] = this.model.aggregate(match, project)
+    if (err) throw err
+    return result
   }
   /**
    *

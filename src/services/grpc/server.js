@@ -106,8 +106,10 @@ export class GRpcServer {
       const requestDate = call.request.startend
       console.log(requestDate)
       // app.camera.getById(id)
-      app.video.getByDate(requestDate)
-      // const cameraIds = Object.values(requestIds)
+      let [err, result] = app.video.getByDate(requestDate)
+      if (err) throw err
+
+      callback(null, { videos: result })
     } catch (error) {
       callback(
         {
