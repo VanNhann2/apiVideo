@@ -103,13 +103,27 @@ export class GRpcServer {
 
   #getVideo = async (call, callback) => {
     try {
-      const requestDate = call.request.startend
+      const requestDate = call.request.time
       console.log(requestDate)
-      // app.camera.getById(id)
-      let [err, result] = app.video.getByDate(requestDate)
+      let [err, result] = await to(app.video.getByDate(requestDate))
       if (err) throw err
 
-      callback(null, { videos: result })
+      let dataResutl = {}
+      if (!_.isEmpty(result)) {
+        dataResutl = {
+          id: result.id,
+          name: result.name,
+          start: result.start,
+          end: result.end,
+          path: '/' + _.replace(result.path, config.pathVideo, 'video'),
+          status: result.status,
+        }
+      }
+
+      console.log('Sever: result------------')
+      console.log(dataResutl)
+
+      callback(null, { videos: dataResutl })
     } catch (error) {
       callback(
         {
