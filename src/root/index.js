@@ -9,13 +9,13 @@ export class Root {
   /** @type {Database} */
   #database = null
 
-  /** @type {GRpcServer} */
-  #grpcServer = null
+  // /** @type {GRpcServer} */
+  // #grpcServer = null
 
   constructor() {
     this.#server = new Server()
     this.#database = new Database()
-    this.#grpcServer = new GRpcServer()
+    // this.#grpcServer = new GRpcServer()
   }
 
   start = async () => {
@@ -24,8 +24,8 @@ export class Root {
     logger.info('Starting server...')
     await this.#server.start()
 
-    logger.info('Starting gRPC server...')
-    await this.#grpcServer.start()
+    // logger.info('Starting gRPC server...')
+    // await this.#grpcServer.start()
 
     logger.info('Starting database client...')
     await this.#database.start()
@@ -40,7 +40,7 @@ export class Root {
     logger.info('Stopping database client...')
     await this.#database.stop()
 
-    logger.info('Stopping gRPC server...')
+    // logger.info('Stopping gRPC server...')
   }
 
   #registerSignal = () => {
