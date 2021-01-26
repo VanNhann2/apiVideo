@@ -12,7 +12,7 @@ import * as validator from '../../validator'
 export const videoRouter = (router) => {
   router.post('/video', async (req, res, next) => {
     try {
-      const { ids, startDate, endDate, page} = req.body
+      const { ids, startDate, endDate, page } = req.body
       if (ids) {
         if (!validator.isMongoIdArray(ids)) {
           throw new RequestError({ code: StatusCodes.BAD_REQUEST, message: 'Ids phải là một mảng' })
