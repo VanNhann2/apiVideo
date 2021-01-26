@@ -133,4 +133,21 @@ export class Video {
       throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Xóa vi video thất bại' })
     }
   }
+
+  /**
+   *
+   * @param {Date} timeVio
+   */
+  getVideoTimeVio = async (time) => {
+    try {
+      console.log({ time })
+      let [err, result] = await to(model.video.getVideoTimeVio(time))
+      if (err) throw err
+
+      return result
+    } catch (error) {
+      logger.error('Get Video from Violation Error', error)
+      throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Get Video from Violation thất bại ' })
+    }
+  }
 }

@@ -30,6 +30,17 @@ export const videoRouter = (router) => {
     }
   })
 
+  router.post('/video/violation', async (req, res, next) => {
+    try {
+      const { time } = req.body
+      const result = await app.video.getVideoTimeVio(time)
+
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   router.get('/video/:id', async (req, res, next) => {
     try {
       const { id } = req.params

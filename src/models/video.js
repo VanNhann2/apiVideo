@@ -196,4 +196,47 @@ export class VideoModel extends BaseModel {
     if (err) throw err
     return result
   }
+
+  /**
+   *
+   * @param {Date}} time
+   */
+  getVideoTimeVio = async (time) => {
+    const timeSearch = Date.parse(time)
+    const startTime = timeSearch - 170000
+    const endTime = timeSearch + 170000
+
+    const otherCondition = { deleted: { $ne: true } }
+
+    const match = {
+      $match: { $and: [{ start: { $gte: new Date(startTime) } }, { end: { $lte: new Date(endTime) } }, otherCondition] },
+    }
+
+    const project = {
+      $project: {
+        id: '$_id',
+        name: 1,
+        start: 1,
+        end: 1,
+        camera: 1,
+        path: 1,
+        status: 1,
+      },
+    }
+    let [err, result] = await to(this.model.aggregate([match, project]))
+    if (err) throw err
+
+    let dataResutl = []
+    if (!_.isEmpty(result)) {
+      _.forEach(result, function (item) {
+        let data = {
+          id: item.id,
+          path: replacePathVideo(item.path),
+        }
+        dataResutl.push(data)
+      })
+    }
+
+    return dataResutl ? dataResutl[0] : {}
+  }
 }
