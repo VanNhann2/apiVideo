@@ -32,8 +32,15 @@ export const videoRouter = (router) => {
 
   router.post('/video/violation', async (req, res, next) => {
     try {
-      const { time } = req.body
-      const result = await app.video.getVideoTimeVio(time)
+      const { time, idCam, alprTime } = req.body
+
+      if (idCam) {
+        if (!validator.isMongoId(idCam)) {
+          throw new RequestError({ code: StatusCodes.BAD_REQUEST, message: 'idCam không hợp lệ' })
+        }
+      }
+
+      const result = await app.video.getVideoTimeVio(time, idCam, alprTime)
 
       res.json(result)
     } catch (error) {

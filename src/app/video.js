@@ -136,12 +136,13 @@ export class Video {
 
   /**
    *
-   * @param {Date} timeVio
+   * @param {import('mongoose').Date} time
+   * @param {String} idCam
+   * @param {import('mongoose').Date} alprTime
    */
-  getVideoTimeVio = async (time) => {
+  getVideoTimeVio = async (time, idCam, alprTime) => {
     try {
-      console.log({ time })
-      let [err, result] = await to(model.video.getVideoTimeVio(time))
+      let [err, result] = await to(model.video.getVideoTimeVio(time, idCam, alprTime))
       if (err) throw err
 
       return result

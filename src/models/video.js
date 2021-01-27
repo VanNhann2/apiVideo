@@ -201,26 +201,22 @@ export class VideoModel extends BaseModel {
    *
    * @param {Date}} time
    */
-  getVideoTimeVio = async (time) => {
-    const timeSearch = Date.parse(time)
-    const startTime = timeSearch - 170000
-    const endTime = timeSearch + 170000
-
+  getVideoTimeVio = async (time, idCam, alprTime) => {
     const otherCondition = { deleted: { $ne: true } }
+    let idCamCondition = _.isEmpty(idCam) ? {} : { $or: [{ camera: mongoose.Types.ObjectId(idCam) }] }
 
     const match = {
-      $match: { $and: [{ start: { $gte: new Date(startTime) } }, { end: { $lte: new Date(endTime) } }, otherCondition] },
+      $match: { $and: [{ start: { $lte: new Date(time) } }, { end: { $gte: new Date(time) } }, idCamCondition, otherCondition] },
+    }
+
+    const match1 = {
+      $match: { $and: [{ start: { $lte: new Date(alprTime) } }, { end: { $gte: new Date(alprTime) } }, idCamCondition, otherCondition] },
     }
 
     const project = {
       $project: {
         id: '$_id',
-        name: 1,
-        start: 1,
-        end: 1,
-        camera: 1,
         path: 1,
-        status: 1,
       },
     }
     let [err, result] = await to(this.model.aggregate([match, project]))
@@ -230,13 +226,30 @@ export class VideoModel extends BaseModel {
     if (!_.isEmpty(result)) {
       _.forEach(result, function (item) {
         let data = {
-          id: item.id,
-          path: replacePathVideo(item.path),
+          vioLink: replacePathVideo(item.path),
         }
         dataResutl.push(data)
       })
     }
 
-    return dataResutl ? dataResutl[0] : {}
+    let dataAlpr = []
+    if (alprTime) {
+      let [errAlpr, resultAlpr] = await to(this.model.aggregate([match1, project]))
+      if (errAlpr) throw errAlpr
+
+      if (!_.isEmpty(resultAlpr)) {
+        _.forEach(resultAlpr, function (item) {
+          let dataA = {
+            alprLink: replacePathVideo(item.path),
+          }
+          dataAlpr.push(dataA)
+        })
+      }
+
+      dataAlpr = { ...dataAlpr[0], ...dataResutl[0] }
+      //add vioLink, alprLink
+    }
+
+    return alprTime ? dataAlpr : dataResutl[0]
   }
 }
