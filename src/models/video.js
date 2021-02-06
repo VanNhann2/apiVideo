@@ -8,7 +8,7 @@ import { replacePathVideo } from '../utils'
 export class VideoModel extends BaseModel {
   constructor() {
     super('Videos', new BaseSchema(videosSchema, schemaOptions))
-    this.perPage = 20
+    this.perPage = 100
   }
 
   /**
@@ -19,6 +19,7 @@ export class VideoModel extends BaseModel {
    * @param {String|mongoose.Types.ObjectId} page
    */
   conditions = async (ids, startSearchDate, endSearchDate, page) => {
+    console.log({ endSearchDate })
     const searchStartDateCondition = _.isEmpty(startSearchDate) ? {} : { $or: [{ start: { $gte: new Date(startSearchDate) } }] }
     const searchEndDateCondition = _.isEmpty(endSearchDate) ? {} : { $or: [{ end: { $lte: new Date(endSearchDate) } }] }
 
@@ -209,10 +210,6 @@ export class VideoModel extends BaseModel {
       $match: { $and: [{ start: { $lte: new Date(time) } }, { end: { $gte: new Date(time) } }, idCamCondition, otherCondition] },
     }
 
-    const match1 = {
-      $match: { $and: [{ start: { $lte: new Date(alprTime) } }, { end: { $gte: new Date(alprTime) } }, idCamCondition, otherCondition] },
-    }
-
     const project = {
       $project: {
         id: '$_id',
@@ -234,6 +231,9 @@ export class VideoModel extends BaseModel {
 
     let dataAlpr = []
     if (alprTime) {
+      const match1 = {
+        $match: { $and: [{ start: { $lte: new Date(alprTime) } }, { end: { $gte: new Date(alprTime) } }, idCamCondition, otherCondition] },
+      }
       let [errAlpr, resultAlpr] = await to(this.model.aggregate([match1, project]))
       if (errAlpr) throw errAlpr
 
@@ -249,7 +249,14 @@ export class VideoModel extends BaseModel {
       dataAlpr = { ...dataAlpr[0], ...dataResutl[0] }
       //add vioLink, alprLink
     }
-
-    return alprTime ? dataAlpr : dataResutl[0]
+    const checkDataAlpr = (data) => {
+      if (JSON.stringify(new String(data.vioLink)) === JSON.stringify(new String(data.alprLink))) {
+        delete dataAlpr.alprLink
+        return dataAlpr
+      } else {
+        return dataAlpr
+      }
+    }
+    return alprTime ? checkDataAlpr(dataAlpr) : dataResutl[0]
   }
 }
