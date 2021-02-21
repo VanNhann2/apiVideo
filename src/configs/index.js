@@ -52,6 +52,7 @@ const grpcConfig = {
 const videoConfig = {
   pathVideo: process.env.VIDEO_FOLDER,
   replacePathVideo: process.env.VIDEO_FILE_PREFIX,
+  limitPerPage: process.env.LIMIT_PER_PAGE,
 }
 
 export const config = {

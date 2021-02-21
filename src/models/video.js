@@ -4,11 +4,11 @@ import _ from 'lodash'
 import { videosSchema, schemaOptions } from './define'
 import { BaseModel, BaseSchema } from './base'
 import { replacePathVideo } from '../utils'
+import { config } from '../configs'
 
 export class VideoModel extends BaseModel {
   constructor() {
     super('Videos', new BaseSchema(videosSchema, schemaOptions))
-    this.perPage = 100
   }
 
   /**
@@ -19,7 +19,6 @@ export class VideoModel extends BaseModel {
    * @param {String|mongoose.Types.ObjectId} page
    */
   conditions = async (ids, startSearchDate, endSearchDate, page) => {
-    console.log({ endSearchDate })
     const searchStartDateCondition = _.isEmpty(startSearchDate) ? {} : { $or: [{ start: { $gte: new Date(startSearchDate) } }] }
     const searchEndDateCondition = _.isEmpty(endSearchDate) ? {} : { $or: [{ end: { $lte: new Date(endSearchDate) } }] }
 
@@ -46,8 +45,8 @@ export class VideoModel extends BaseModel {
       { $addFields: { id: '$_id' } },
       project,
       { $sort: { start: -1 } },
-      { $skip: this.perPage * (page - 1) },
-      { $limit: this.perPage },
+      { $skip: config.limitPerPage * (page - 1) },
+      { $limit: config.limitPerPage },
     ]
     const conditionsCount = [match]
 
@@ -130,48 +129,7 @@ export class VideoModel extends BaseModel {
     let [err, result] = await to(this.model.aggregate([match, project]))
     if (err) throw err
 
-    // if (_.isEmpty(result)) return {}
-    // return result[0]
     return !_.isEmpty(result) ? result[0] : {}
-  }
-
-  /**
-   *
-   * @param {String} requestDate
-   */
-  getByDate = async (requestDate) => {
-    const date = Date.parse(requestDate[0])
-    const startDate = date - 250000
-    const endDate = date + 250000
-    console.log(startDate + '----------------' + endDate)
-    // const sortStart = { $gte: start }
-    // const sortEnd = { $lte: end }
-
-    // const searchStartDateCondition = _.isEmpty(start.toString()) ? {} : { $or: [{ start: { $gte: start } }] }
-    // const searchEndDateCondition = _.isEmpty(end.toString()) ? {} : { $or: [{ end: { $lte: end } }] }
-    const otherCondition = { deleted: { $ne: true } }
-
-    const match = {
-      $match: { $and: [{ start: { $gte: new Date(startDate) } }, { end: { $lte: new Date(endDate) } }, otherCondition] },
-    }
-
-    const project = {
-      $project: {
-        id: '$_id',
-        name: 1,
-        start: 1,
-        end: 1,
-        camera: 1,
-        path: 1,
-        status: 1,
-      },
-    }
-    let [err, result] = await to(this.model.aggregate([match, project]))
-    console.log('Model: result------------------------')
-    console.log(result)
-    if (err) throw err
-
-    return result[0]
   }
 
   /**
@@ -199,8 +157,10 @@ export class VideoModel extends BaseModel {
   }
 
   /**
-   *
-   * @param {Date}} time
+   * 
+   * @param {Date} time 
+   * @param {String} idCam 
+   * @param {Date} alprTime 
    */
   getVideoTimeVio = async (time, idCam, alprTime) => {
     const otherCondition = { deleted: { $ne: true } }

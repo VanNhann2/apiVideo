@@ -6,12 +6,11 @@ import { config } from '../configs'
 import { GRpcClient } from '../services/grpc'
 
 export class Video {
-  /** @type {GRpcClient} */
-  #grpcClient = undefined
+  // /** @type {GRpcClient} */
+  // #grpcClient = undefined
 
   constructor() {
-    this.perPage = 20
-    this.#grpcClient = new GRpcClient('10.49.46.251:50052', config.protoFile, 'parking.Camera')
+    // this.#grpcClient = new GRpcClient('10.49.46.251:50052', config.protoFile, 'parking.Camera')
   }
 
   /**
@@ -19,11 +18,11 @@ export class Video {
    * @param {String|mongoose.Types.ObjectId} ids
    * @param {Date} startDate
    * @param {Date} endDate
-   * @param {Number} page
+   * @param {Number || String} page
    */
   getAll = async (ids, startDate, endDate, page) => {
     try {
-      const startSearchDate = startDate && startDate !== '' && startDate !== 'null' ? new Date(startDate).toISOString() : undefined
+      const startSearchDate = startDate && startDate !== '' && startDate !== 'null' ? startDate : undefined
       const endSearchDate = endDate && endDate !== '' && endDate !== 'null' ? endDate : undefined
       let [err, conditions] = await to(model.video.conditions(ids, startSearchDate, endSearchDate, page))
       if (err) throw err
@@ -39,8 +38,25 @@ export class Video {
       dataVio = result[0]
       total = result[1]
       const totalRecord = total[0]?.myCount
-      const totalPage = Math.ceil(totalRecord / this.perPage)
+      const totalPage = Math.ceil(totalRecord / config.limitPerPage)
       const pageData = dataVio
+
+      return { pageData, totalRecord, totalPage }
+    } catch (error) {
+      logger.error('Video.getAll() error', error)
+      throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Lấy video vi phạm thất bại' })
+    }
+  }
+
+  /**
+   *
+   * @param {String|mongoose.Types.ObjectId} id
+   */
+  getById = async (id) => {
+    try {
+      let [err, result] = await to(model.video.getById(id))
+      if (err) throw err
+
       // let ids = []
       // _.forEach(dataVio, function (item) {
       //   ids.push(item.camera)
@@ -78,22 +94,6 @@ export class Video {
       //   pageData.push(item)
       // })
 
-      return { pageData, totalRecord, totalPage }
-    } catch (error) {
-      logger.error('Video.getAll() error', error)
-      throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Lấy video vi phạm thất bại' })
-    }
-  }
-
-  /**
-   *
-   * @param {String|mongoose.Types.ObjectId} id
-   */
-  getById = async (id) => {
-    try {
-      let [err, result] = await to(model.video.getById(id))
-      if (err) throw err
-
       return result
     } catch (error) {
       logger.error('Video.getById() error', error)
@@ -102,25 +102,8 @@ export class Video {
   }
 
   /**
-   *
-   * @param {Object} requestDate
-   */
-  getByDate = async (requestDate) => {
-    try {
-      const value = Object.values(requestDate)
-      let [err, result] = await to(model.video.getByDate(value))
-      if (err) throw err
-
-      return result
-    } catch (error) {
-      logger.error('Video.getByDate() error', error)
-      throw new AppError({ code: StatusCodes.INTERNAL_SERVER_ERROR, message: 'Lấy video vi phạm thất bại' })
-    }
-  }
-
-  /**
    * Delete video
-   * @param {string|mongoose.Types.ObjectId}
+   * @param {string|mongoose.Types.ObjectId} ids
    */
   delete = async (ids) => {
     try {
