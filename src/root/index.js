@@ -1,6 +1,5 @@
 import { logger } from '../utils'
-import { Server, Database, GRpcServer } from '../services'
-import { model } from '../models'
+import { Server, Database } from '../services'
 
 export class Root {
   /** @type {Server} */
@@ -9,13 +8,9 @@ export class Root {
   /** @type {Database} */
   #database = null
 
-  // /** @type {GRpcServer} */
-  // #grpcServer = null
-
   constructor() {
     this.#server = new Server()
     this.#database = new Database()
-    // this.#grpcServer = new GRpcServer()
   }
 
   start = async () => {
@@ -24,13 +19,8 @@ export class Root {
     logger.info('Starting server...')
     await this.#server.start()
 
-    // logger.info('Starting gRPC server...')
-    // await this.#grpcServer.start()
-
     logger.info('Starting database client...')
     await this.#database.start()
-
-    await model.createRequiredCollections()
   }
 
   stop = async () => {
@@ -39,8 +29,6 @@ export class Root {
 
     logger.info('Stopping database client...')
     await this.#database.stop()
-
-    // logger.info('Stopping gRPC server...')
   }
 
   #registerSignal = () => {

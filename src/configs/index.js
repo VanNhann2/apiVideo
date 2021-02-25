@@ -20,35 +20,6 @@ const databaseConfig = {
   databaseName: process.env.DATABASE_NAME,
 }
 
-// const snapshotConfig = {
-//   snapshotPrefix: process.env.SNAPSHOT_FILE_PREFIX,
-//   tempFolder: process.env.TEMP_FOLDER,
-//   snapshotTempPrefix: process.env.SNAPSHOT_TEMP_FILE_PREFIX,
-//   thumnailPrefix: process.env.THUMNAIL_NAME_PREFIX,
-//   imageFormat: process.env.IMAGE_NAME_FORMAT,
-// }
-
-// const storageConfig = {
-//   publicFolder: process.env.PUBLIC_FOLDER,
-//   staticFolder: process.env.STATIC_FOLDER,
-//   objectsFolder: process.env.OBJECTS_FOLDER,
-//   videosFolder: process.env.VIDEOS_FOLDER,
-// }
-
-// const streamConfig = {
-//   streamPrefix: process.env.STREAM_FILE_PREFIX,
-//   playlistName: process.env.PLAYLIST_NAME,
-//   mainStreamPostfix: process.env.MAIN_STREAM_POSTFIX,
-//   subStreamPostfix: process.env.SUB_STREAM_POSTFIX,
-// }
-
-const grpcConfig = {
-  protoFolder: process.env.PROTO_FOLDER,
-  protoFile: process.env.PROTO_FILE,
-  grpcAddress: process.env.GRPC_ADDRESS,
-  grpcServiceName: process.env.GRPC_SERVICE_NAME,
-}
-
 const videoConfig = {
   pathVideo: process.env.VIDEO_FOLDER,
   replacePathVideo: process.env.VIDEO_FILE_PREFIX,
@@ -59,9 +30,5 @@ export const config = {
   env: process.env.NODE_ENV,
   ...hostConfig,
   ...databaseConfig,
-  //   ...storageConfig,
-  //   ...snapshotConfig,
-  //   ...streamConfig,
   ...videoConfig,
-  ...grpcConfig,
 }
