@@ -128,11 +128,10 @@ export class VideoModel extends BaseModel {
       let [errAlpr, resultAlpr] = await to(this.model.aggregate([match1, project]))
       if (errAlpr) throw errAlpr
 
-      if (_.isEmpty(resultAlpr)) return dataAlpr
+      if (_.isEmpty(resultAlpr)) return dataResutl
       let dataAl = {
         alprLink: replacePathVideo(resultAlpr[0].path),
       }
-
       dataAlpr = { ...dataAl, ...dataResutl }
     }
 
